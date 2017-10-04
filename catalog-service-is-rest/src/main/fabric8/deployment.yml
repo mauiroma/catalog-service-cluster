@@ -1,0 +1,46 @@
+spec:
+  template:
+    spec:
+      containers:
+        - readinessProbe:
+            failureThreshold: 2
+            httpGet:
+              path: "/health/readiness"
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            successTreshold: 1
+            timeoutSeconds: 1
+          livenessProbe:
+            failureThreshold: 2
+            httpGet:
+              path: "/health/readiness"
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 100m
+              memory: 200Mi
+          env:
+            - name: JAVA_ARGS
+              value: "-cluster -Djava.net.preferIPv4Stack=true -Dvertx.infinispan.config=catalog-service-infinispan.xml -Djgroups.tcp.address=NON_LOOPBACK"
+            - name: OPENSHIFT_KUBE_PING_LABELS
+              value: application=vertx-catalog-service
+            - name: OPENSHIFT_KUBE_PING_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: OPENSHIFT_KUBE_PING_SERVER_PORT
+              value: '8778'
+            - name: AB_JOLOKIA_OFF
+              value: "true"
+            - name: AB_OFF
+              value: "true"
